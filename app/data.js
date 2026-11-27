@@ -8,7 +8,7 @@
   var DEALS = [
     { slug: "airpods-pro-3-amazon", group: "airpods-pro-3", name: "Apple AirPods Pro 3", store: "Amazon", category: "Tech", sale: 149.00, usual: 249.00, verdict: "NEW LOW", source: "CNN Underscored", evidence: "Only time they have fallen below $169; $100 off." },
     { slug: "airpods-pro-3-walmart", group: "airpods-pro-3", name: "Apple AirPods Pro 3", store: "Walmart", category: "Tech", sale: 149.00, usual: 249.00, verdict: "NEW LOW", source: "9to5Toys", evidence: "Lowest price deal trackers have recorded; re-checked 25 Nov, price unchanged." },
-    { slug: "airpods-pro-3-target", group: "airpods-pro-3", name: "Apple AirPods Pro 3", store: "Target", category: "Tech", sale: 179.99, usual: 249.99, verdict: "ROUTINE SALE", source: "Flash Deal Feed", evidence: "Price checked 25 Nov; seen lower at Amazon and Walmart." },
+    { slug: "airpods-pro-3-target", group: "airpods-pro-3", name: "Apple AirPods Pro 3", store: "Target", category: "Tech", sale: 149.99, usual: 249.99, verdict: "STRONG DEAL", source: "Target; CNN", evidence: "Target dropped to $149.99 on 27 Nov, matching Amazon's $149 all-time low." },
     { slug: "apple-watch-series-12-42mm-gps-amazon", group: "apple-watch-12", name: "Apple Watch Series 12 42mm GPS", store: "Amazon", category: "Tech", sale: 299.00, usual: 399.00, verdict: "NEW LOW", source: "CNN; Tom's Guide", evidence: "Best price to date; all-time low price on Apple Watch 12." },
     { slug: "apple-watch-series-12-42mm-gps-walmart", group: "apple-watch-12", name: "Apple Watch Series 12 42mm GPS", store: "Walmart", category: "Tech", sale: 299.00, usual: 399.00, verdict: "NEW LOW", source: "9to5Toys", evidence: "New all-time low." },
     { slug: "apple-watch-se-3", name: "Apple Watch SE 3", store: "Walmart", category: "Tech", sale: 179.00, usual: 249.00, verdict: "ROUTINE SALE", source: "9to5Toys", evidence: "Now even lower; no all-time-low claim." },
@@ -26,7 +26,7 @@
     { slug: "hisense-65-u7-mini-led", name: "Hisense 65-inch U7 Mini-LED", store: "Amazon", category: "TV & Audio", sale: 797.99, usual: 1497.99, verdict: "STRONG DEAL", source: "Product Bible", evidence: "Lowest Amazon price on this TV." },
     { slug: "hisense-98-qd5-qled-4k-tv", name: "Hisense 98-inch QD5 QLED 4K TV", store: "Best Buy", category: "TV & Audio", sale: 800.00, usual: 2500.00, verdict: "STRONG DEAL", source: "Cashback Index", evidence: "Hisense 98-inch QD5 at $800, was $2,500." },
     { slug: "sony-dualsense-wireless-controller-amazon", group: "dualsense", name: "Sony DualSense Wireless Controller", store: "Amazon", category: "Gaming", sale: 54.00, usual: 74.99, verdict: "ROUTINE SALE", source: "The Verge", evidence: "Black Friday controller deal, checked 27 Nov." },
-    { slug: "meta-quest-3s-128gb-amazon", group: "quest-3s", name: "Meta Quest 3S 128GB", store: "Amazon", category: "Gaming", sale: 298.00, usual: 350.00, verdict: "ROUTINE SALE", source: "The Verge", evidence: "Black Friday headset deal, checked 27 Nov." },
+    { slug: "meta-quest-3s-128gb-amazon", group: "quest-3s", name: "Meta Quest 3S 128GB", store: "Amazon", category: "Gaming", sale: 297.00, usual: 349.99, verdict: "ROUTINE SALE", source: "The Verge", evidence: "Black Friday headset deal, checked 27 Nov." },
     { slug: "meta-quest-3s-128gb-target", group: "quest-3s", name: "Meta Quest 3S 128GB", store: "Target", category: "Gaming", sale: 297.49, usual: 349.99, verdict: "ROUTINE SALE", source: "Flash Deal Feed", evidence: "Target Black Friday price, checked 27 Nov." },
     { slug: "sony-dualsense-controller-marathon-limited-edition", name: "Sony DualSense Controller Marathon Limited Edition", store: "Target", category: "Gaming", sale: 64.99, usual: 84.99, verdict: "ROUTINE SALE", source: "Flash Deal Feed", evidence: "Target Black Friday price, checked 27 Nov." },
     { slug: "dyson-v9-motorbar-cordless-vacuum-target", group: "dyson-v9", name: "Dyson V9 Motorbar Cordless Vacuum", store: "Target", category: "Home & Kitchen", sale: 269.99, usual: 599.99, verdict: "NEW LOW", source: "CNN; Flash Deal Feed", evidence: "55% discount matches the lowest price ever." },
@@ -62,7 +62,7 @@
     "airpods-pro-3": [
       { store: "Amazon", sale: 149.00, usual: 249.00 },
       { store: "Walmart", sale: 149.00, usual: 249.00 },
-      { store: "Target", sale: 179.99, usual: 249.99 }
+      { store: "Target", sale: 149.99, usual: 249.99 }
     ],
     "apple-watch-12": [
       { store: "Amazon", sale: 299.00, usual: 399.00 },
@@ -73,7 +73,7 @@
       { store: "Amazon", sale: 270.00, usual: 599.99 }
     ],
     "quest-3s": [
-      { store: "Amazon", sale: 298.00, usual: 350.00 },
+      { store: "Amazon", sale: 297.00, usual: 349.99 },
       { store: "Target", sale: 297.49, usual: 349.99 }
     ],
     "beats-studio-pro": [
