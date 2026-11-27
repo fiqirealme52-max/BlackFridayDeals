@@ -14,8 +14,8 @@ time the price was checked, and the source where the price was read.
 
 - **48 verified deals** — Tech 12, TV & Audio 7, Gaming 4, Home & Kitchen 9,
   Toys 7, Smart Home 5, Fashion 2, Beauty 2.
-- **Verdicts:** 6 NEW LOW · 24 STRONG DEAL · 18 ROUTINE SALE.
-- **Total savings if you bought one of everything: $8,846.47** (computed from
+- **Verdicts:** 6 NEW LOW · 25 STRONG DEAL · 17 ROUTINE SALE.
+- **Total savings if you bought one of everything: $8,877.46** (computed from
   the deal data, not typed in).
 - **Stores:** Amazon 24 · Target 10 · Walmart 9 · Best Buy 4 · Dyson 1.
 - **All prices checked 27 Nov 2026, 13:30 WIB** (reading window 13:20–13:50 WIB;
