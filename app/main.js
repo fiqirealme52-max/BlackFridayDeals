@@ -1,121 +1,124 @@
-/* DealHawk app: stats bar (computed from data), hash routing, controls,
-   and grid rendering. No network calls, no timestamps at runtime — the
-   only date shown is the fixed check time stored in data.js. */
-(function () {
-  var F = window.DealHawkFilters;
-  var V = window.DealHawkViews;
-  var DATA = window.DEALHAWK;
+/* DealHawk main — render stats, store strip, top picks, grid; hash router. */
 
-  var state = { q: "", category: "All", store: "All", minDiscount: 0, verdict: "All", sort: "best" };
+var PRODUCTS = groupByProduct(DEALS);
+var MULTI_STORE_KEYS = new Set(PRODUCTS.filter((p) => p.variants.length > 1).map((p) => p.key));
+var PRODUCT_BY_KEY = {};
+PRODUCTS.forEach((p) => { PRODUCT_BY_KEY[p.key] = p; });
+var DEAL_BY_SLUG = {};
+for (const d of DEALS) DEAL_BY_SLUG[slugOf(d, MULTI_STORE_KEYS.has(d.key))] = d;
 
-  var CATEGORIES = ["Tech", "TV & Audio", "Gaming", "Home & Kitchen", "Toys", "Smart Home", "Fashion", "Beauty"];
-  var STORES = ["Amazon", "Target", "Walmart", "Best Buy", "Dyson"];
+var NEW_LOWS = DEALS.filter((d) => d.verdict === 'NEW LOW').length;
+var TOTAL_SAVE = DEALS.reduce((s, d) => s + saveOf(d), 0);
 
-  function $(id) { return document.getElementById(id); }
+function el(id) { return document.getElementById(id); }
 
-  function renderStats() {
-    var deals = DATA.deals;
-    var newLow = deals.filter(function (d) { return d.verdict === "NEW LOW"; }).length;
-    var totalSave = deals.reduce(function (sum, d) { return sum + (d.usual - d.sale); }, 0);
-    $("stat-deals").textContent = deals.length + " verified deals";
-    $("stat-newlow").textContent = newLow + " new lows";
-    $("stat-save").textContent = "Total savings " + F.money(totalSave);
-    $("stat-checked").textContent = "Last checked " + DATA.checkedAt;
+function renderStats() {
+  el('stat-deals').textContent = DEALS.length;
+  el('stat-lows').textContent = NEW_LOWS;
+  el('stat-save').textContent = 'Total savings $' + TOTAL_SAVE.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  el('stat-checked').textContent = CHECKED;
+}
+
+function renderStores() {
+  const counts = {};
+  for (const d of DEALS) counts[d.store] = (counts[d.store] || 0) + 1;
+  const order = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  el('stores').innerHTML = '<span class="store-label">Deals by store:</span>' +
+    order.map((s) => '<span class="store-chip">' + s + ' <b>' + counts[s] + '</b></span>').join('');
+}
+
+function renderPicks() {
+  const best = PRODUCTS.slice().sort((a, b) => scoreOf(b.best) - scoreOf(a.best) || discountOf(b.best) - discountOf(a.best)).slice(0, 6);
+  el('pick-row').innerHTML = best.map((p) => {
+    const d = p.best;
+    const multi = MULTI_STORE_KEYS.has(d.key);
+    const tag = d.verdict === 'NEW LOW' ? 'Lowest yet' : 'Deep cut';
+    const cls = d.verdict === 'NEW LOW' ? 'lowest' : 'deep';
+    return '<a class="pick" href="#/deal/' + slugOf(d, multi) + '">' +
+      '<span class="off">&minus;' + discountOf(d) + '%</span>' +
+      '<span class="nm">' + esc(d.name) + '</span>' +
+      '<span class="pr">' + money(d.sale) + ' at ' + esc(d.store) + '</span>' +
+      '<span class="tag2 ' + cls + '">' + tag + '</span></a>';
+  }).join('');
+}
+
+function currentFilters() {
+  return {
+    q: el('q').value,
+    cat: el('f-cat').value,
+    store: el('f-store').value,
+    disc: parseInt(el('f-disc').value, 10) || 0,
+    verdict: el('f-verdict').value,
+    sort: el('f-sort').value
+  };
+}
+
+function renderGrid() {
+  const f = currentFilters();
+  const filtered = filterProducts(PRODUCTS, f);
+  const sorted = sortProducts(filtered, f.sort);
+  const labels = { best: 'sorted by best deal score', discount: 'sorted by biggest discount', price: 'sorted by lowest price', name: 'sorted by name A–Z' };
+  el('view').innerHTML = gridHtml(sorted, DEALS.length, PRODUCTS.length, labels[f.sort]);
+}
+
+/* Hash query params (e.g. #/?disc=50) pre-set the filters, so a filtered
+   view can be linked and screenshotted directly. */
+function applyHashParams() {
+  const hash = location.hash || '#/';
+  const qi = hash.indexOf('?');
+  if (qi === -1) return;
+  const params = new URLSearchParams(hash.slice(qi + 1));
+  const map = { q: 'q', cat: 'f-cat', store: 'f-store', disc: 'f-disc', verdict: 'f-verdict', sort: 'f-sort' };
+  for (const key of Object.keys(map)) {
+    if (params.has(key)) el(map[key]).value = params.get(key);
   }
+}
 
-  function renderGrid() {
-    var filtered = F.applyFilters(DATA.deals, state);
-    var sorted = F.sortDeals(filtered, state.sort);
-    var grid = $("grid");
-    var count = $("count");
-    if (sorted.length === 0) {
-      grid.innerHTML = '<p class="empty">No deals match those filters. Try widening the search or lowering the discount filter.</p>';
-    } else {
-      grid.innerHTML = sorted.map(V.cardHTML).join("");
-    }
-    count.textContent = sorted.length + " of " + DATA.deals.length + " deals";
-  }
-
-  function renderDetail(slug) {
-    var deal = null;
-    for (var i = 0; i < DATA.deals.length; i++) {
-      if (DATA.deals[i].slug === slug) { deal = DATA.deals[i]; break; }
-    }
-    var detail = $("detail");
-    var gridWrap = $("grid-wrap");
-    if (!deal) {
-      detail.innerHTML = '<p class="empty">Deal not found. <a href="#/">Back to all deals</a></p>';
-    } else {
-      detail.innerHTML = V.detailHTML(deal);
-      document.title = deal.name + " — " + F.money(deal.sale) + " at " + deal.store + " | DealHawk";
-    }
-    detail.hidden = false;
-    gridWrap.hidden = true;
+function renderRoute() {
+  const hash = location.hash || '#/';
+  if (hash.indexOf('#/deal/') === 0) {
+    el('view').innerHTML = detailHtml(hash.slice(7));
     window.scrollTo(0, 0);
-  }
-
-  function renderHome() {
-    $("detail").hidden = true;
-    $("detail").innerHTML = "";
-    $("grid-wrap").hidden = false;
-    document.title = "DealHawk — Real Black Friday Deals, Checked Today";
+  } else {
     renderGrid();
   }
+}
 
-  function parseHash() {
-    var h = window.location.hash || "#/";
-    if (h.indexOf("#/deal/") === 0) {
-      renderDetail(h.slice(7));
-      return;
-    }
-    /* Filter state can ride in the hash: #/?discount=50&verdict=NEW+LOW */
-    var qi = h.indexOf("?");
-    if (qi !== -1) {
-      var params = new URLSearchParams(h.slice(qi + 1));
-      var d = parseInt(params.get("discount") || "0", 10);
-      state.minDiscount = isNaN(d) ? 0 : d;
-      var v = params.get("verdict");
-      state.verdict = v ? v : "All";
-      syncControls();
-    }
-    renderHome();
+function fillOptions() {
+  const cats = [];
+  const stores = [];
+  for (const d of DEALS) {
+    if (cats.indexOf(d.cat) === -1) cats.push(d.cat);
+    if (stores.indexOf(d.store) === -1) stores.push(d.store);
   }
-
-  function syncControls() {
-    $("q").value = state.q;
-    $("category").value = state.category;
-    $("store").value = state.store;
-    $("discount").value = String(state.minDiscount);
-    $("verdict").value = state.verdict;
-    $("sort").value = state.sort;
+  cats.sort();
+  stores.sort();
+  for (const c of cats) {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    el('f-cat').appendChild(o);
   }
-
-  function fillOptions() {
-    var cat = $("category");
-    CATEGORIES.forEach(function (c) {
-      var o = document.createElement("option");
-      o.value = c; o.textContent = c; cat.appendChild(o);
-    });
-    var st = $("store");
-    STORES.forEach(function (s) {
-      var o = document.createElement("option");
-      o.value = s; o.textContent = s; st.appendChild(o);
-    });
+  for (const s of stores) {
+    const o = document.createElement('option');
+    o.value = s; o.textContent = s;
+    el('f-store').appendChild(o);
   }
+}
 
-  function bind() {
-    $("q").addEventListener("input", function (e) { state.q = e.target.value; renderGrid(); });
-    $("category").addEventListener("change", function (e) { state.category = e.target.value; renderGrid(); });
-    $("store").addEventListener("change", function (e) { state.store = e.target.value; renderGrid(); });
-    $("discount").addEventListener("change", function (e) { state.minDiscount = parseInt(e.target.value, 10); renderGrid(); });
-    $("verdict").addEventListener("change", function (e) { state.verdict = e.target.value; renderGrid(); });
-    $("sort").addEventListener("change", function (e) { state.sort = e.target.value; renderGrid(); });
-    window.addEventListener("hashchange", parseHash);
-  }
-
+function init() {
   fillOptions();
-  bind();
   renderStats();
-  syncControls();
-  parseHash();
-})();
+  renderStores();
+  renderPicks();
+  ['q', 'f-cat', 'f-store', 'f-disc', 'f-verdict', 'f-sort'].forEach((id) => {
+    el(id).addEventListener('input', () => {
+      if ((location.hash || '#/') !== '#/') location.hash = '#/';
+      else renderGrid();
+    });
+  });
+  window.addEventListener('hashchange', renderRoute);
+  applyHashParams();
+  renderRoute();
+}
+
+init();

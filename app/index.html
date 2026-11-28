@@ -4,87 +4,69 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DealHawk — Real Black Friday Deals, Checked Today</title>
-<meta name="description" content="48 verified Black Friday deals from Amazon, Target, Walmart, Best Buy and Dyson. Every price read from the web and checked 27 Nov 2026, 13:30 WIB, with source and evidence for each deal.">
 <link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:,">
 </head>
 <body>
 <header class="top">
-  <div class="wrap">
-    <p class="brand"><span class="hawk" aria-hidden="true">&#9670;</span> DealHawk</p>
-    <h1>Real Black Friday deals, checked today.</h1>
-    <p class="sub">No inflated "was" prices, no guesswork. Every deal below was read from a
-    real store or deal roundup and checked <strong>27 Nov 2026, 13:30 WIB</strong>.
-    Each card shows the sale price, the usual price, the discount, the verdict,
-    and where the price was read.</p>
-    <div class="stats" id="stats">
-      <span class="stat" id="stat-deals">48 verified deals</span>
-      <span class="stat" id="stat-newlow">6 new lows</span>
-      <span class="stat" id="stat-save">Total savings $8,846.47</span>
-      <span class="stat" id="stat-checked">Last checked 27 Nov 2026, 13:30 WIB</span>
-    </div>
-  </div>
+  <div class="brand"><span class="mark">&#9670;</span> DEALHAWK</div>
+  <div class="tag">Real Black Friday deals, checked today.</div>
+  <div class="dates">Black Friday 2026 &middot; Cyber Monday preview 29&ndash;30 Nov</div>
 </header>
 
-<main class="wrap">
-  <section id="grid-wrap">
-    <div class="controls" role="search">
-      <input id="q" type="search" placeholder="Search a product — try &quot;AirPods&quot;, &quot;LEGO&quot;, &quot;Dyson&quot;&hellip;" aria-label="Search products">
-      <label>Category
-        <select id="category" aria-label="Filter by category">
-          <option value="All">All categories</option>
-        </select>
-      </label>
-      <label>Store
-        <select id="store" aria-label="Filter by store">
-          <option value="All">All stores</option>
-        </select>
-      </label>
-      <label>Discount
-        <select id="discount" aria-label="Filter by discount">
-          <option value="0">Any discount</option>
-          <option value="20">20% off or more</option>
-          <option value="40">40% off or more</option>
-          <option value="50">50% off or more</option>
-        </select>
-      </label>
-      <label>Verdict
-        <select id="verdict" aria-label="Filter by verdict">
-          <option value="All">All verdicts</option>
-          <option value="NEW LOW">New low only</option>
-          <option value="STRONG DEAL">Strong deals</option>
-          <option value="ROUTINE SALE">Routine sales</option>
-        </select>
-      </label>
-      <label>Sort
-        <select id="sort" aria-label="Sort deals">
-          <option value="best">Best deals first</option>
-          <option value="discount">Biggest discount</option>
-          <option value="price">Lowest price</option>
-          <option value="name">Name A–Z</option>
-        </select>
-      </label>
-    </div>
-    <p class="legend"><span class="card-verdict v-new">NEW LOW</span> all-time low, per the source.
-    <span class="card-verdict v-strong">STRONG DEAL</span> a big cut, 40%+ or the lowest tracked price.
-    <span class="card-verdict v-routine">ROUTINE SALE</span> a real cut, but seen cheaper before.</p>
-    <p id="count" class="count">48 of 48 deals</p>
-    <div class="grid" id="grid"></div>
-  </section>
-  <section id="detail" hidden></section>
-</main>
+<section class="stats" aria-label="Summary">
+  <div class="pill"><b id="stat-deals">&mdash;</b><span>verified deals</span></div>
+  <div class="pill"><b id="stat-lows">&mdash;</b><span>new lows</span></div>
+  <div class="pill"><b id="stat-save">&mdash;</b><span>total savings</span></div>
+  <div class="pill"><b id="stat-checked">&mdash;</b><span>last checked</span></div>
+</section>
 
-<footer class="wrap">
-  <h2>How to check a deal yourself</h2>
-  <p>Every card links straight to the store's own search for that product, so you can
-  see the live price in one click. The "where the price was read" line on each detail
-  page names the roundup or store page the price came from, and the evidence quote is
-  what that source actually said. Prices were read 27 Nov 2026, 13:20–13:50 WIB;
-  four deals were spot-checked again at 13:35 WIB and were unchanged. Black Friday
-  prices move fast — if a store price has moved since, the card still shows what we
-  verified and when.</p>
-  <p class="fine">DealHawk is an independent deal finder. It is not affiliated with Amazon,
-  Target, Walmart, Best Buy, or Dyson. Prices in US dollars. "Usual" means the
-  product's regular list price as quoted by the source that reported the deal.</p>
+<section class="stores" id="stores" aria-label="Deals per store"></section>
+
+<section class="picks" aria-label="Today's top picks">
+  <h2>Today&rsquo;s Top Picks</h2>
+  <div class="pick-row" id="pick-row"></div>
+</section>
+
+<section class="filters" aria-label="Search and filters">
+  <input id="q" type="search" placeholder="Search deals &mdash; try &ldquo;AirPods&rdquo;&hellip;" aria-label="Search deals">
+  <select id="f-cat" aria-label="Category"><option value="">All categories</option></select>
+  <select id="f-store" aria-label="Store"><option value="">All stores</option></select>
+  <select id="f-disc" aria-label="Minimum discount">
+    <option value="0">Any discount</option>
+    <option value="20">20%+ off</option>
+    <option value="40">40%+ off</option>
+    <option value="50">50%+ off</option>
+  </select>
+  <select id="f-verdict" aria-label="Verdict">
+    <option value="">All verdicts</option>
+    <option value="NEW LOW">New lows</option>
+    <option value="STRONG DEAL">Strong deals</option>
+    <option value="ROUTINE SALE">Routine sales</option>
+  </select>
+  <select id="f-sort" aria-label="Sort">
+    <option value="best">Best deals first</option>
+    <option value="discount">Biggest discount</option>
+    <option value="price">Lowest price</option>
+    <option value="name">Name A&ndash;Z</option>
+  </select>
+</section>
+
+<section class="legend" aria-label="What the verdicts mean">
+  <span><i class="chip newlow">NEW LOW</i> lowest price ever recorded</span>
+  <span><i class="chip strong">STRONG DEAL</i> 40%+ off, or best price to date</span>
+  <span><i class="chip routine">ROUTINE SALE</i> a cut, but seen cheaper before</span>
+  <span class="legend-score">Score 0&ndash;100 = verdict + discount + savings. See README.</span>
+</section>
+
+<main id="view"></main>
+
+<footer>
+  <p><b>How we checked.</b> Every price was read at the store or in a deals source that names the
+  store, on 28 Nov 2026. Discounts are computed from the two prices shown on each card &mdash;
+  nothing is typed in by hand. Store links go to the store&rsquo;s own search for that product.</p>
+  <p>DealHawk is not affiliated with any store. Prices move; the check time on each card is when
+  its price was last read.</p>
 </footer>
 
 <script src="data.js"></script>

@@ -4,76 +4,78 @@
 [![Rank](https://make.fun/badge/black-friday-deal-finder-01/fiqirealme52-max/BlackFridayDeals/rank.svg)](https://make.fun/bounty/black-friday-deal-finder-01?utm_source=github&utm_medium=readme&utm_campaign=black-friday-deal-finder-01)
 [![Reward](https://make.fun/badge/black-friday-deal-finder-01/fiqirealme52-max/BlackFridayDeals/reward.svg)](https://make.fun/bounty/black-friday-deal-finder-01?utm_source=github&utm_medium=readme&utm_campaign=black-friday-deal-finder-01)
 
-DealHawk is a Black Friday deal finder built around one rule: a deal only counts
-if its price was actually read from a real store or deal roundup. Every one of
-the **48 deals** on the site carries the sale price, the usual price, the
-discount (computed from those two numbers, never typed by hand), a verdict, the
-time the price was checked, and the source where the price was read.
+A Black Friday deal finder that only lists prices read live at the store or in a
+deals source that names the store. Every card shows the product, the store, the
+sale price, the usual price, the discount (computed from the two prices shown),
+a verdict, a 0–100 score, the check time, and the source the price was read from.
 
 ## The numbers
 
-- **48 verified deals** — Tech 12, TV & Audio 7, Gaming 4, Home & Kitchen 9,
-  Toys 7, Smart Home 5, Fashion 2, Beauty 2.
-- **Verdicts:** 6 NEW LOW · 25 STRONG DEAL · 17 ROUTINE SALE.
-- **Total savings if you bought one of everything: $8,877.46** (computed from
-  the deal data, not typed in).
-- **Stores:** Amazon 24 · Target 10 · Walmart 9 · Best Buy 4 · Dyson 1.
-- **All prices checked 27 Nov 2026, 13:30 WIB** (reading window 13:20–13:50 WIB;
-  AirPods Pro 3, Dyson V9, Sony WH-1000XM5 and the LEGO Rhino were spot-checked
-  again at 13:35 WIB and were unchanged).
+- **58 verified deals** — 53 products across 7 stores (Amazon 31 · Target 10 ·
+  Walmart 9 · Best Buy 5 · Costco 1 · Nike 1 · Dyson 1) and 8 categories
+  (Tech 13 · TV & Audio 10 · Gaming 4 · Home & Kitchen 10 · Toys 7 ·
+  Smart Home 7 · Fashion 4 · Beauty 3).
+- **13 new lows** · 28 strong deals · 17 routine sales.
+- **Total savings $10,923.77** — the sum of (usual − sale) over all 58 deals,
+  computed from `app/data.js` at render time.
+- **Last checked: 28 Nov 2026, 09:00 WIB.** Every deal was re-verified live on
+  the build day; prices that moved were updated to the live price, and deals
+  that could no longer be verified were dropped (Skechers Go Walk Flex — price
+  moved and its usual price could not be re-confirmed; a duplicate KitchenAid
+  Classic row and a duplicate Ring Floodlight row were merged into one deal each).
 
-## What the verdicts mean
+## Score 0–100
 
-- **NEW LOW** — the source explicitly calls it an all-time low, lowest ever, or
-  best price to date. Only 6 deals earned this.
-- **STRONG DEAL** — a cut of 40% or more, or the source calls it the lowest
-  price it has tracked.
-- **ROUTINE SALE** — a real cut, but the price has been seen lower before, or
-  the cut is small (under 20%).
+Each card carries a score so the best deals sort first. The formula is the same
+for every card:
+
+- Verdict base: NEW LOW 50 · STRONG DEAL 35 · ROUTINE SALE 20
+- Plus 0.6 points per discount percent (rounded)
+- Plus 5 points when the deal saves $100 or more
+- Capped at 100
+
+Example: the Fire TV Stick 4K (2026 model) is NEW LOW at 67% off, saving $40 —
+50 + 40 + 0 = 90. The Dyson V9 at Target is NEW LOW at 55% off, saving $330 —
+50 + 33 + 5 = 88.
+
+## Verdicts
+
+- **NEW LOW** — a source explicitly says all-time low / lowest ever / best price
+  to date / matches lowest ever. Ties count: a price that matches a previous
+  record low (TruSkin, the three Ring cameras) is a new low, not a new record.
+- **STRONG DEAL** — 40%+ off, or a source calls it the best/lowest price.
+- **ROUTINE SALE** — a cut, but seen cheaper before, or under 20% off.
+
+## How prices were verified
+
+Each price was read live on 28 Nov 2026 from the store listing or from a dated
+deal roundup (27–28 Nov 2026) that names the store and the price. Store links go
+to the store's own search for that product — no product URLs were invented. Two
+prices needed a live check for the exact variant: the Nike Dunk Low (size 10,
+Shimmer/Burnt Sunrise — $91.07, not $86.73) and the Fire TV Stick 4K (the $19.99
+deal is the 2026 model with Vega OS, not the 2023 hardware).
 
 ## Features
 
-- **Search** by product name, plus filters for category, store, discount
-  (20%+ / 40%+ / 50%+) and verdict.
-- **Sorting:** best deals first (verdict, then discount), biggest discount,
-  lowest price, name A–Z.
-- **Detail page per deal** (`#/deal/<slug>`) with the full evidence: source,
-  the quote the source actually gave, and the check time.
-- **Same-product comparison** on six hero products (AirPods Pro 3, Apple Watch
-  Series 12, Dyson V9, Meta Quest 3S, Beats Studio Pro, Sony DualSense): the
-  verified price at each store, with the cheapest marked BEST PRICE.
+Search by product name; filter by category, store, minimum discount (20%+ /
+40%+ / 50%+) and verdict; sort by best deal score, biggest discount, lowest
+price, or name. One card per product — the best price is shown first, with the
+other stores listed on the card. Each deal has its own page (`#/deal/<slug>`)
+with the full evidence and a same-product, other-stores comparison table with the
+best price marked. "Today's Top Picks" shows the six highest-scored deals.
 
-## How to verify a deal
+## Run it
 
-1. Open a deal's detail page and read the source + evidence lines.
-2. Click "Shop at …" — it opens the store's own search for that exact product,
-   so you can see the live price in one click. (Links go to store search pages,
-   never to invented product URLs.)
-3. Compare the live price with the checked price and check time shown on the
-   card. Black Friday prices move fast; if a store price has moved since
-   13:30 WIB, the card still shows what was verified and when.
+Serve `app/` over HTTP and open it — no build step, no network load, vanilla JS:
 
-Deals with shaky "was" prices were left out on purpose — for example a bundle
-whose "$50 off" claim did not match its real usual price, and a TV whose list
-price looked inflated for the model.
-
-## Run it locally
-
-```sh
-cd app
-python3 -m http.server 8080
-# open http://localhost:8080/
+```
+python3 -m http.server 8080 --directory app
 ```
 
-Vanilla JavaScript, no framework, no network loads — everything lives in
-`app/` (HTML, CSS, and four small JS files: data, filters, views, app logic).
+Then open http://localhost:8080. The entrypoint `main.ts` (Node, standard library
+only) copies `app/` and `screenshots/` to the output directory and writes
+`dossier.json`:
 
-## Build the submission dossier
-
-```sh
+```
 mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 ```
-
-`main.ts` copies `app/` and `screenshots/` into the output directory and
-writes `dossier.json` via the bundled frontend helper in
-`vendor/makefun-frontend.ts`.

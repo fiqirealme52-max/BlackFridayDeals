@@ -1,92 +1,90 @@
-/* DealHawk data — 48 Black Friday deals, all prices read from the web and
-   checked 27 Nov 2026, 13:30 WIB. Discount % is NOT stored here: it is
-   computed at render time from sale / usual. Savings totals are computed
-   from this file too, so the numbers on screen always match the data. */
-(function () {
-  var CHECKED_AT = "27 Nov 2026, 13:30 WIB";
+/* DealHawk R3 data — 58 deals, every price re-verified live on 28 Nov 2026.
+   sale + usual are numbers; discount % is computed at render, never typed.
+   Verdict rules: NEW LOW only when a source explicitly says all-time low /
+   lowest ever / best price to date / matches lowest ever. STRONG DEAL when
+   the discount is 40%+ or a source calls it the best/lowest price.
+   ROUTINE SALE otherwise. "Checked" is one fixed string for all deals. */
 
-  var DEALS = [
-    { slug: "airpods-pro-3-amazon", group: "airpods-pro-3", name: "Apple AirPods Pro 3", store: "Amazon", category: "Tech", sale: 149.00, usual: 249.00, verdict: "NEW LOW", source: "CNN Underscored", evidence: "Only time they have fallen below $169; $100 off." },
-    { slug: "airpods-pro-3-walmart", group: "airpods-pro-3", name: "Apple AirPods Pro 3", store: "Walmart", category: "Tech", sale: 149.00, usual: 249.00, verdict: "NEW LOW", source: "9to5Toys", evidence: "Lowest price deal trackers have recorded; re-checked 25 Nov, price unchanged." },
-    { slug: "airpods-pro-3-target", group: "airpods-pro-3", name: "Apple AirPods Pro 3", store: "Target", category: "Tech", sale: 149.99, usual: 249.99, verdict: "STRONG DEAL", source: "Target; CNN", evidence: "Target dropped to $149.99 on 27 Nov, matching Amazon's $149 all-time low." },
-    { slug: "apple-watch-series-12-42mm-gps-amazon", group: "apple-watch-12", name: "Apple Watch Series 12 42mm GPS", store: "Amazon", category: "Tech", sale: 299.00, usual: 399.00, verdict: "NEW LOW", source: "CNN; Tom's Guide", evidence: "Best price to date; all-time low price on Apple Watch 12." },
-    { slug: "apple-watch-series-12-42mm-gps-walmart", group: "apple-watch-12", name: "Apple Watch Series 12 42mm GPS", store: "Walmart", category: "Tech", sale: 299.00, usual: 399.00, verdict: "NEW LOW", source: "9to5Toys", evidence: "New all-time low." },
-    { slug: "apple-watch-se-3", name: "Apple Watch SE 3", store: "Walmart", category: "Tech", sale: 179.00, usual: 249.00, verdict: "ROUTINE SALE", source: "9to5Toys", evidence: "Now even lower; no all-time-low claim." },
-    { slug: "apple-airpods-4", name: "Apple AirPods 4", store: "Walmart", category: "Tech", sale: 89.00, usual: 129.00, verdict: "ROUTINE SALE", source: "The Verge", evidence: "$20 shy of their best price." },
-    { slug: "apple-airpods-max-2", name: "Apple AirPods Max 2", store: "Amazon", category: "Tech", sale: 419.00, usual: 549.00, verdict: "ROUTINE SALE", source: "The Verge", evidence: "$19 shy of their best price to date." },
-    { slug: "apple-macbook-neo-256gb", name: "Apple MacBook Neo 256GB", store: "Amazon", category: "Tech", sale: 649.00, usual: 699.00, verdict: "ROUTINE SALE", source: "The Verge", evidence: "$50 off list price." },
-    { slug: "apple-macbook-air-13-m5", name: "Apple MacBook Air 13-inch M5", store: "Amazon", category: "Tech", sale: 989.00, usual: 1299.00, verdict: "ROUTINE SALE", source: "9to5Toys via beebulletin", evidence: "$989 ($310 off)." },
-    { slug: "sony-wh-1000xm5", name: "Sony WH-1000XM5", store: "Best Buy", category: "Tech", sale: 169.99, usual: 398.00, verdict: "STRONG DEAL", source: "Best Buy via Hot Hardware; Digital Trends", evidence: "$169.99 at Best Buy, save $228.01; doorbuster through 28 Nov." },
-    { slug: "beats-studio-pro", group: "beats-studio-pro", name: "Beats Studio Pro", store: "Walmart", category: "Tech", sale: 99.00, usual: 299.00, verdict: "STRONG DEAL", source: "dealnews", evidence: "Drop to $99, which is $200 off." },
-    { slug: "samsung-55-the-frame-tv", name: "Samsung 55-inch The Frame TV", store: "Target", category: "TV & Audio", sale: 899.99, usual: 1199.99, verdict: "ROUTINE SALE", source: "Flash Deal Feed", evidence: "Target Black Friday price, checked 27 Nov." },
-    { slug: "tcl-65-qled-smart-frame-tv", name: "TCL 65-inch QLED Smart Frame TV", store: "Target", category: "TV & Audio", sale: 799.99, usual: 994.99, verdict: "ROUTINE SALE", source: "Flash Deal Feed", evidence: "Target Black Friday price, checked 27 Nov." },
-    { slug: "tcl-65-4k-uhd-hdr-smart-tv-fire-tv", name: "TCL 65-inch 4K UHD HDR Smart TV with Fire TV", store: "Best Buy", category: "TV & Audio", sale: 229.99, usual: 469.99, verdict: "STRONG DEAL", source: "Best Buy release via beebulletin", evidence: "$469.99 down to $229.99 ($240 off)." },
-    { slug: "lg-b6e-oled-tv-55", name: "LG B6E OLED TV 55-inch", store: "Best Buy", category: "TV & Audio", sale: 700.00, usual: 1400.00, verdict: "STRONG DEAL", source: "The Verge", evidence: "$700, was $1,400, 50% off at Best Buy (55-inch)." },
-    { slug: "hisense-canvastv-55-2026", name: "Hisense CanvasTV 55-inch (2026)", store: "Amazon", category: "TV & Audio", sale: 798.00, usual: 1500.00, verdict: "STRONG DEAL", source: "The Verge", evidence: "$798, was $1,500, 47% off." },
-    { slug: "hisense-65-u7-mini-led", name: "Hisense 65-inch U7 Mini-LED", store: "Amazon", category: "TV & Audio", sale: 797.99, usual: 1497.99, verdict: "STRONG DEAL", source: "Product Bible", evidence: "Lowest Amazon price on this TV." },
-    { slug: "hisense-98-qd5-qled-4k-tv", name: "Hisense 98-inch QD5 QLED 4K TV", store: "Best Buy", category: "TV & Audio", sale: 800.00, usual: 2500.00, verdict: "STRONG DEAL", source: "Cashback Index", evidence: "Hisense 98-inch QD5 at $800, was $2,500." },
-    { slug: "sony-dualsense-wireless-controller-amazon", group: "dualsense", name: "Sony DualSense Wireless Controller", store: "Amazon", category: "Gaming", sale: 54.00, usual: 74.99, verdict: "ROUTINE SALE", source: "The Verge", evidence: "Black Friday controller deal, checked 27 Nov." },
-    { slug: "meta-quest-3s-128gb-amazon", group: "quest-3s", name: "Meta Quest 3S 128GB", store: "Amazon", category: "Gaming", sale: 297.00, usual: 349.99, verdict: "ROUTINE SALE", source: "The Verge", evidence: "Black Friday headset deal, checked 27 Nov." },
-    { slug: "meta-quest-3s-128gb-target", group: "quest-3s", name: "Meta Quest 3S 128GB", store: "Target", category: "Gaming", sale: 297.49, usual: 349.99, verdict: "ROUTINE SALE", source: "Flash Deal Feed", evidence: "Target Black Friday price, checked 27 Nov." },
-    { slug: "sony-dualsense-controller-marathon-limited-edition", name: "Sony DualSense Controller Marathon Limited Edition", store: "Target", category: "Gaming", sale: 64.99, usual: 84.99, verdict: "ROUTINE SALE", source: "Flash Deal Feed", evidence: "Target Black Friday price, checked 27 Nov." },
-    { slug: "dyson-v9-motorbar-cordless-vacuum-target", group: "dyson-v9", name: "Dyson V9 Motorbar Cordless Vacuum", store: "Target", category: "Home & Kitchen", sale: 269.99, usual: 599.99, verdict: "NEW LOW", source: "CNN; Flash Deal Feed", evidence: "55% discount matches the lowest price ever." },
-    { slug: "dyson-v9-motorbar-cordless-vacuum-amazon", group: "dyson-v9", name: "Dyson V9 Motorbar Cordless Vacuum", store: "Amazon", category: "Home & Kitchen", sale: 270.00, usual: 599.99, verdict: "NEW LOW", source: "CNN", evidence: "Matches the lowest price ever for only the second time this year." },
-    { slug: "dyson-ball-animal-total-clean-vacuum", name: "Dyson Ball Animal Total Clean Vacuum", store: "Target", category: "Home & Kitchen", sale: 299.99, usual: 499.99, verdict: "STRONG DEAL", source: "Flash Deal Feed", evidence: "Target Black Friday price, checked 27 Nov." },
-    { slug: "dyson-v15-detect", name: "Dyson V15 Detect", store: "Amazon", category: "Home & Kitchen", sale: 598.50, usual: 849.99, verdict: "STRONG DEAL", source: "Product Bible", evidence: "Lowest price on this listing." },
-    { slug: "irobot-roomba-plus-415-combo", name: "iRobot Roomba Plus 415 Combo Robot Vacuum and Mop", store: "Target", category: "Home & Kitchen", sale: 379.99, usual: 599.99, verdict: "ROUTINE SALE", source: "Flash Deal Feed", evidence: "Target Black Friday price, checked 27 Nov." },
-    { slug: "shark-detect-lift-away-upright-vacuum", name: "Shark Detect Lift-Away Upright Vacuum", store: "Walmart", category: "Home & Kitchen", sale: 144.00, usual: 380.00, verdict: "STRONG DEAL", source: "dealnews", evidence: "Starts at $144, down from $380." },
-    { slug: "kitchenaid-deluxe-4-5-qt-stand-mixer", name: "KitchenAid Deluxe 4.5 Qt Stand Mixer", store: "Walmart", category: "Home & Kitchen", sale: 279.00, usual: 449.99, verdict: "ROUTINE SALE", source: "ShopLTK; The Bold News", evidence: "$279 (was $450)." },
-    { slug: "kitchenaid-classic-4-5-qt-stand-mixer-k45ss", name: "KitchenAid Classic 4.5 Qt Stand Mixer K45SS", store: "Amazon", category: "Home & Kitchen", sale: 279.99, usual: 399.99, verdict: "STRONG DEAL", source: "CyberMondayIsHere", evidence: "Lowest price we have tracked." },
-    { slug: "ninja-air-fryer-pro-af141-5qt", name: "Ninja Air Fryer Pro AF141 5Qt", store: "Amazon", category: "Home & Kitchen", sale: 78.99, usual: 129.99, verdict: "STRONG DEAL", source: "CyberMondayIsHere", evidence: "Lowest price we have tracked, down $11." },
-    { slug: "lego-creator-3-in-1-majestic-rhino-31171", name: "LEGO Creator 3-in-1 Majestic Rhino 31171", store: "Amazon", category: "Toys", sale: 29.99, usual: 59.99, verdict: "STRONG DEAL", source: "Consumer Queen", evidence: "Compared with a $59.99 list price, 50% off." },
-    { slug: "lego-minecraft-mooshroom-house-21270", name: "LEGO Minecraft Mooshroom House 21270", store: "Target", category: "Toys", sale: 24.99, usual: 46.49, verdict: "STRONG DEAL", source: "Consumer Queen", evidence: "Regularly $46.49." },
-    { slug: "lego-star-wars-smart-play-mos-eisley-cantina-75425", name: "LEGO Star Wars SMART Play Mos Eisley Cantina 75425", store: "Target", category: "Toys", sale: 38.99, usual: 64.99, verdict: "STRONG DEAL", source: "Consumer Queen; Flash Deal Feed", evidence: "Regularly $64.99; $39, down from $65." },
-    { slug: "lego-star-wars-jango-fetts-starship-75433", name: "LEGO Star Wars Jango Fett's Starship 75433", store: "Walmart", category: "Toys", sale: 35.00, usual: 69.99, verdict: "STRONG DEAL", source: "Consumer Queen", evidence: "Down from $69.99." },
-    { slug: "lego-creator-3-in-1-cute-animals-red-panda-31394", name: "LEGO Creator 3-in-1 Cute Animals Red Panda 31394", store: "Walmart", category: "Toys", sale: 15.00, usual: 29.99, verdict: "STRONG DEAL", source: "Consumer Queen; dealnews", evidence: "$15, down from $30." },
-    { slug: "lego-botanicals-mini-bonsai-trees", name: "LEGO Botanicals Mini Bonsai Trees", store: "Amazon", category: "Toys", sale: 44.99, usual: 59.99, verdict: "ROUTINE SALE", source: "dealnews; CNN", evidence: "$44.99 at Amazon; $45 at Amazon." },
-    { slug: "lego-star-wars-the-mandalorians-n-1-starfighter", name: "LEGO Star Wars The Mandalorian's N-1 Starfighter", store: "Amazon", category: "Toys", sale: 41.99, usual: 59.99, verdict: "ROUTINE SALE", source: "starwars-fans.com", evidence: "$59.99 list, $41.99 at Amazon." },
-    { slug: "amazon-echo-dot-newest-2026", name: "Amazon Echo Dot (newest, 2026)", store: "Amazon", category: "Smart Home", sale: 49.99, usual: 99.99, verdict: "STRONG DEAL", source: "Home Automation Weekly", evidence: "Prices checked 24 Nov, 9:16 AM ET." },
-    { slug: "amazon-echo-dot-max", name: "Amazon Echo Dot Max", store: "Amazon", category: "Smart Home", sale: 49.99, usual: 119.99, verdict: "STRONG DEAL", source: "Home Automation Weekly; The Verge", evidence: "$50 at Amazon." },
-    { slug: "amazon-echo-time", name: "Amazon Echo Time", store: "Amazon", category: "Smart Home", sale: 99.99, usual: 199.99, verdict: "STRONG DEAL", source: "Home Automation Weekly", evidence: "Price from Amazon's Echo comparison table." },
-    { slug: "ring-wired-doorbell-2k", name: "Ring Wired Doorbell 2K", store: "Amazon", category: "Smart Home", sale: 39.99, usual: 79.99, verdict: "STRONG DEAL", source: "Home Automation Weekly", evidence: "Prices checked 24 Nov." },
-    { slug: "ring-floodlight-cam-2k", name: "Ring Floodlight Cam 2K", store: "Amazon", category: "Smart Home", sale: 98.99, usual: 199.99, verdict: "STRONG DEAL", source: "BasketPrice", evidence: "Verified 26 Nov." },
-    { slug: "new-balance-mens-574-core-sneakers", name: "New Balance Men's 574 Core Sneakers", store: "Amazon", category: "Fashion", sale: 75.00, usual: 99.99, verdict: "ROUTINE SALE", source: "CNN Underscored", evidence: "25% off; $75 at Amazon." },
-    { slug: "skechers-womens-go-walk-flex-hands-free-slip-ins", name: "Skechers Women's Go Walk Flex Hands Free Slip-Ins", store: "Amazon", category: "Fashion", sale: 51.21, usual: 60.25, verdict: "ROUTINE SALE", source: "BasketPrice", evidence: "Typical price $60.25; verified 26 Nov." },
-    { slug: "dyson-airwrap-multistyler", name: "Dyson Airwrap Multistyler", store: "Dyson", category: "Beauty", sale: 499.00, usual: 649.99, verdict: "STRONG DEAL", source: "Medium; The Beat DFW", evidence: "Lowest price of the year; Airwrap $499." },
-    { slug: "waterpik-aquarius-water-flosser", name: "Waterpik Aquarius Water Flosser", store: "Amazon", category: "Beauty", sale: 49.99, usual: 99.99, verdict: "STRONG DEAL", source: "Product Bible", evidence: "Half price." }
-  ];
+var CHECKED = '28 Nov 2026, 09:00 WIB';
 
-  /* Same-product prices at other stores, for the six hero products.
-     Only prices that were verified in the deal research are listed here. */
-  var COMPARE = {
-    "airpods-pro-3": [
-      { store: "Amazon", sale: 149.00, usual: 249.00 },
-      { store: "Walmart", sale: 149.00, usual: 249.00 },
-      { store: "Target", sale: 149.99, usual: 249.99 }
-    ],
-    "apple-watch-12": [
-      { store: "Amazon", sale: 299.00, usual: 399.00 },
-      { store: "Walmart", sale: 299.00, usual: 399.00 }
-    ],
-    "dyson-v9": [
-      { store: "Target", sale: 269.99, usual: 599.99 },
-      { store: "Amazon", sale: 270.00, usual: 599.99 }
-    ],
-    "quest-3s": [
-      { store: "Amazon", sale: 297.00, usual: 349.99 },
-      { store: "Target", sale: 297.49, usual: 349.99 }
-    ],
-    "beats-studio-pro": [
-      { store: "Walmart", sale: 99.00, usual: 299.00 },
-      { store: "Amazon", sale: 139.95, usual: 349.99 },
-      { store: "Target", sale: 149.99, usual: 349.99 }
-    ],
-    "dualsense": [
-      { store: "Amazon", sale: 54.00, usual: 74.99 },
-      { store: "Best Buy", sale: 54.99, usual: 74.99 },
-      { store: "Target", sale: 54.99, usual: 74.99 }
-    ]
-  };
+var DEALS = [
+  /* Tech (13) */
+  { key: 'airpods-pro-3', name: 'Apple AirPods Pro 3', store: 'Amazon', cat: 'Tech', sale: 149.00, usual: 249.00, verdict: 'NEW LOW', src: 'CNN Underscored', ev: "Only time they've fallen below $169 — $100 off, lowest price yet.", note: 'Amazon stock sold out and came back during Black Friday.' },
+  { key: 'airpods-pro-3', name: 'Apple AirPods Pro 3', store: 'Walmart', cat: 'Tech', sale: 149.00, usual: 249.00, verdict: 'NEW LOW', src: '9to5Toys', ev: 'Lowest price deal trackers have recorded.' },
+  { key: 'airpods-pro-3', name: 'Apple AirPods Pro 3', store: 'Target', cat: 'Tech', sale: 179.99, usual: 249.99, verdict: 'ROUTINE SALE', src: 'MacRumors', ev: '$179.99, down from $249.99 — seen cheaper at Amazon and Walmart.' },
+  { key: 'apple-watch-series-12', name: 'Apple Watch Series 12 42mm GPS', store: 'Amazon', cat: 'Tech', sale: 299.00, usual: 399.00, verdict: 'NEW LOW', src: 'CNN Underscored', ev: 'Best price to date — all-time low on Apple Watch 12.' },
+  { key: 'apple-watch-series-12', name: 'Apple Watch Series 12 42mm GPS', store: 'Walmart', cat: 'Tech', sale: 299.00, usual: 399.00, verdict: 'NEW LOW', src: '9to5Toys', ev: 'New all-time low.' },
+  { key: 'apple-watch-se-3', name: 'Apple Watch SE 3', store: 'Walmart', cat: 'Tech', sale: 179.00, usual: 249.00, verdict: 'ROUTINE SALE', src: 'CNN Underscored', ev: 'Now even lower — no all-time-low claim.' },
+  { key: 'airpods-4', name: 'Apple AirPods 4', store: 'Walmart', cat: 'Tech', sale: 89.00, usual: 129.00, verdict: 'ROUTINE SALE', src: 'The Verge', ev: '$20 shy of their best price.' },
+  { key: 'airpods-max-2', name: 'Apple AirPods Max 2', store: 'Amazon', cat: 'Tech', sale: 419.00, usual: 549.00, verdict: 'ROUTINE SALE', src: 'The Verge', ev: '$19 shy of their best price to date.' },
+  { key: 'macbook-neo', name: 'Apple MacBook Neo 256GB', store: 'Amazon', cat: 'Tech', sale: 649.00, usual: 699.00, verdict: 'ROUTINE SALE', src: '9to5Toys', ev: '$649 (Reg. $700) — 7% off.' },
+  { key: 'macbook-air-m5', name: 'Apple MacBook Air 13" M5', store: 'Amazon', cat: 'Tech', sale: 1049.00, usual: 1299.00, verdict: 'ROUTINE SALE', src: 'The Gadgeteer', ev: 'Was $989.10 on Monday, now $1,049 — 19% off, still $250 off.' },
+  { key: 'sony-wh-1000xm5', name: 'Sony WH-1000XM5', store: 'Best Buy', cat: 'Tech', sale: 169.99, usual: 398.00, verdict: 'STRONG DEAL', src: 'Best Buy', ev: 'Save $228.01 — 57% off the $398 comparable value.' },
+  { key: 'beats-studio-pro', name: 'Beats Studio Pro', store: 'Walmart', cat: 'Tech', sale: 99.00, usual: 299.00, verdict: 'STRONG DEAL', src: 'dealnews', ev: 'Drops to $99 — $200 off, the best price we have seen.' },
+  { key: 'airtag-2', name: 'Apple AirTag 2 (1-pack)', store: 'Amazon', cat: 'Tech', sale: 18.00, usual: 29.00, verdict: 'NEW LOW', src: 'MacRumors', ev: 'New all-time low price — $18 at Amazon and Best Buy, down from $29.' },
+  /* TV & Audio (10) */
+  { key: 'samsung-the-frame-55', name: 'Samsung 55" The Frame TV', store: 'Target', cat: 'TV & Audio', sale: 899.99, usual: 1199.99, verdict: 'ROUTINE SALE', src: 'MacRumors', ev: '$899.99, down from $1,199.99.' },
+  { key: 'tcl-qled-smart-frame-65', name: 'TCL 65" QLED Smart Frame TV', store: 'Target', cat: 'TV & Audio', sale: 799.99, usual: 994.99, verdict: 'ROUTINE SALE', src: 'MacRumors', ev: '$799.99, down from $994.99.' },
+  { key: 'tcl-4k-fire-tv-65', name: 'TCL 65" 4K UHD HDR Smart TV with Fire TV', store: 'Best Buy', cat: 'TV & Audio', sale: 229.99, usual: 469.99, verdict: 'STRONG DEAL', src: 'Best Buy', ev: '$469.99 to $229.99 — $240 off, doorbuster.', note: 'Doorbuster — ends 28 Nov.' },
+  { key: 'lg-b6e-oled-55', name: 'LG B6E OLED TV 55"', store: 'Best Buy', cat: 'TV & Audio', sale: 699.99, usual: 1399.99, verdict: 'STRONG DEAL', src: 'The Verge', ev: '$699.99 — half the $1,399.99 comparable value.' },
+  { key: 'hisense-canvastv-55', name: 'Hisense CanvasTV 55" (2026)', store: 'Amazon', cat: 'TV & Audio', sale: 697.99, usual: 1499.99, verdict: 'STRONG DEAL', src: 'PC Guide', ev: 'Down to $697.99 — within cents of its record low; was $798 earlier in the week.' },
+  { key: 'hisense-u7-65', name: 'Hisense 65" U7 Mini-LED', store: 'Amazon', cat: 'TV & Audio', sale: 797.99, usual: 1497.99, verdict: 'NEW LOW', src: 'PC Guide', ev: 'At its lowest price according to price tracking sites — hits its Amazon all-time low.' },
+  { key: 'hisense-qd5-98', name: 'Hisense 98" QD5 QLED 4K TV', store: 'Best Buy', cat: 'TV & Audio', sale: 799.99, usual: 2499.99, verdict: 'STRONG DEAL', src: 'Cashback Index', ev: '$799.99, was $2,499.99 — 68% off.', note: 'Deal ends 28 Nov.' },
+  { key: 'fire-tv-stick-4k', name: 'Amazon Fire TV Stick 4K (2026 model)', store: 'Amazon', cat: 'TV & Audio', sale: 19.99, usual: 59.99, verdict: 'NEW LOW', src: 'PCWorld', ev: 'Now $19.99, was $59.99 — lowest price ever.', note: '2026 model — Vega OS 2.0, Wi-Fi 6, no Dolby Vision.' },
+  { key: 'tcl-q3cr-40', name: 'TCL 40" Q3CR QLED Roku TV (2026)', store: 'Best Buy', cat: 'TV & Audio', sale: 99.99, usual: 299.99, verdict: 'STRONG DEAL', src: 'Best Buy', ev: '$99.99, Save $200, comparable value $299.99.', note: 'Deal ends 28 Nov.' },
+  { key: 'samsung-s90h-65', name: 'Samsung 65" S90H OLED TV', store: 'Costco', cat: 'TV & Audio', sale: 1399.99, usual: 2699.99, verdict: 'STRONG DEAL', src: 'SlashGear', ev: 'Costco lists the 65-inch S90H at $1,399.99, down from its $2,699.99 MSRP.', note: 'Costco membership required.' },
+  /* Gaming (4) */
+  { key: 'dualsense', name: 'Sony DualSense Wireless Controller', store: 'Amazon', cat: 'Gaming', sale: 54.00, usual: 74.99, verdict: 'ROUTINE SALE', src: 'The Verge', ev: '$54, down from $74.99.' },
+  { key: 'meta-quest-3s', name: 'Meta Quest 3S 128GB', store: 'Amazon', cat: 'Gaming', sale: 297.00, usual: 349.99, verdict: 'ROUTINE SALE', src: '9to5Google', ev: '$297 at Amazon — $53 off.' },
+  { key: 'meta-quest-3s', name: 'Meta Quest 3S 128GB', store: 'Target', cat: 'Gaming', sale: 297.49, usual: 349.99, verdict: 'ROUTINE SALE', src: 'VR.org', ev: '$297.49 — plus a $50 Target gift card.', note: '$50 Target gift card included.' },
+  { key: 'dualsense-marathon-le', name: 'Sony DualSense Controller Marathon Limited Edition', store: 'Target', cat: 'Gaming', sale: 64.99, usual: 84.99, verdict: 'ROUTINE SALE', src: 'Target', ev: '$64.99, reg $84.99 — in stock.' },
+  /* Home & Kitchen (10) */
+  { key: 'dyson-v9-motorbar', name: 'Dyson V9 Motorbar Cordless Vacuum', store: 'Target', cat: 'Home & Kitchen', sale: 269.99, usual: 599.99, verdict: 'NEW LOW', src: 'CNN Underscored', ev: '55% off matches the lowest price ever.' },
+  { key: 'dyson-v9-motorbar', name: 'Dyson V9 Motorbar Cordless Vacuum', store: 'Amazon', cat: 'Home & Kitchen', sale: 269.95, usual: 599.99, verdict: 'NEW LOW', src: 'CNN Underscored', ev: 'Matches the lowest price ever for only the second time this year.' },
+  { key: 'dyson-ball-animal', name: 'Dyson Ball Animal Total Clean Vacuum', store: 'Target', cat: 'Home & Kitchen', sale: 299.99, usual: 499.99, verdict: 'STRONG DEAL', src: 'Target', ev: '$299.99, reg $499.99 — 40% off.' },
+  { key: 'dyson-v15-detect', name: 'Dyson V15 Detect', store: 'Amazon', cat: 'Home & Kitchen', sale: 598.50, usual: 849.99, verdict: 'STRONG DEAL', src: 'Product Bible', ev: 'Lowest price on this listing.' },
+  { key: 'roomba-plus-415', name: 'iRobot Roomba Plus 415 Combo Robot Vacuum and Mop', store: 'Target', cat: 'Home & Kitchen', sale: 379.99, usual: 599.99, verdict: 'ROUTINE SALE', src: 'Target', ev: '$379.99, reg $599.99.' },
+  { key: 'shark-detect-lift-away', name: 'Shark Detect Lift-Away Upright Vacuum', store: 'Walmart', cat: 'Home & Kitchen', sale: 144.00, usual: 379.99, verdict: 'STRONG DEAL', src: 'dealnews', ev: 'Starts at $144, down from $379.99 — 62% off.' },
+  { key: 'kitchenaid-deluxe-45', name: 'KitchenAid Deluxe 4.5-Qt Stand Mixer', store: 'Walmart', cat: 'Home & Kitchen', sale: 279.00, usual: 449.99, verdict: 'ROUTINE SALE', src: 'ShopLTK', ev: '$279 (was $450).' },
+  { key: 'kitchenaid-classic-45', name: 'KitchenAid Classic 4.5-Qt Stand Mixer (K45SS)', store: 'Amazon', cat: 'Home & Kitchen', sale: 279.99, usual: 399.99, verdict: 'STRONG DEAL', src: '9to5Toys', ev: '$279.99, down from $400 — best price of the year.' },
+  { key: 'kitchenaid-bowl-lift-55', name: 'KitchenAid 5.5-Qt Bowl-Lift Stand Mixer (KSM55)', store: 'Amazon', cat: 'Home & Kitchen', sale: 299.99, usual: 499.99, verdict: 'STRONG DEAL', src: 'Product Bible', ev: '$299.99, list $499.99 — about 40% under, lowest since April.' },
+  { key: 'ninja-air-fryer-af141', name: 'Ninja Air Fryer Pro AF141 5Qt', store: 'Amazon', cat: 'Home & Kitchen', sale: 78.99, usual: 129.99, verdict: 'STRONG DEAL', src: 'CyberMondayIsHere', ev: 'Lowest price we have tracked, down $11.' },
+  /* Toys (7) */
+  { key: 'lego-rhino-31171', name: 'LEGO Creator 3-in-1 Majestic Rhino 31171', store: 'Amazon', cat: 'Toys', sale: 29.99, usual: 59.99, verdict: 'STRONG DEAL', src: 'Consumer Queen', ev: '$29.99 against a $59.99 list price — 50% off.' },
+  { key: 'lego-mooshroom-21270', name: 'LEGO Minecraft Mooshroom House 21270', store: 'Target', cat: 'Toys', sale: 24.99, usual: 46.49, verdict: 'STRONG DEAL', src: 'Consumer Queen', ev: 'Regularly $46.49.' },
+  { key: 'lego-mos-eisley-75425', name: 'LEGO Star Wars SMART Play Mos Eisley Cantina 75425', store: 'Target', cat: 'Toys', sale: 38.99, usual: 64.99, verdict: 'STRONG DEAL', src: 'Consumer Queen', ev: 'Regularly $64.99.' },
+  { key: 'lego-jango-fett-75433', name: "LEGO Star Wars Jango Fett's Starship 75433", store: 'Walmart', cat: 'Toys', sale: 35.00, usual: 69.99, verdict: 'STRONG DEAL', src: 'Consumer Queen', ev: 'Down from $69.99 — by far its best-ever price (dealnews).', note: 'Walmart notes 65% of this deal is gone.' },
+  { key: 'lego-red-panda-31394', name: 'LEGO Creator 3-in-1 Cute Animals Red Panda 31394', store: 'Walmart', cat: 'Toys', sale: 15.00, usual: 29.99, verdict: 'STRONG DEAL', src: 'dealnews', ev: '$15, down from $30 — 50% off.' },
+  { key: 'lego-mini-bonsai', name: 'LEGO Botanicals Mini Bonsai Trees', store: 'Amazon', cat: 'Toys', sale: 44.99, usual: 64.99, verdict: 'ROUTINE SALE', src: 'PopSci', ev: '$44.99 (was $64.99) — 31% off.' },
+  { key: 'lego-n1-starfighter', name: "LEGO Star Wars The Mandalorian's N-1 Starfighter", store: 'Amazon', cat: 'Toys', sale: 41.99, usual: 59.99, verdict: 'ROUTINE SALE', src: 'starwars-fans.com', ev: '$41.99, down from $59.99.' },
+  /* Smart Home (7) */
+  { key: 'echo-dot-2026', name: 'Amazon Echo Dot (newest, 2026)', store: 'Amazon', cat: 'Smart Home', sale: 49.99, usual: 99.99, verdict: 'STRONG DEAL', src: 'Home Automation Weekly', ev: '50% off — prices checked 24 Nov.' },
+  { key: 'echo-dot-max', name: 'Amazon Echo Dot Max', store: 'Amazon', cat: 'Smart Home', sale: 49.99, usual: 119.99, verdict: 'STRONG DEAL', src: 'Home Automation Weekly', ev: 'From $119.99 to $49.99 — 58% off.' },
+  { key: 'echo-time', name: 'Amazon Echo Time', store: 'Amazon', cat: 'Smart Home', sale: 99.99, usual: 199.99, verdict: 'STRONG DEAL', src: '9to5Toys', ev: 'New all-time low on the brand-new Echo Time — $100 off.' },
+  { key: 'ring-wired-doorbell-2k', name: 'Ring Wired Doorbell 2K', store: 'Amazon', cat: 'Smart Home', sale: 39.99, usual: 79.99, verdict: 'STRONG DEAL', src: 'Home Automation Weekly', ev: '50% off — prices checked 24 Nov.' },
+  { key: 'ring-floodlight-cam-2k', name: 'Ring Floodlight Cam 2K', store: 'Amazon', cat: 'Smart Home', sale: 98.99, usual: 199.99, verdict: 'NEW LOW', src: 'PCWorld', ev: 'Matching its all-time lowest price — $98.99 is the live Amazon listing price.' },
+  { key: 'ring-battery-doorbell-2k', name: 'Ring Battery Doorbell 2K', store: 'Amazon', cat: 'Smart Home', sale: 39.99, usual: 99.99, verdict: 'NEW LOW', src: '9to5Toys', ev: 'Lowest price we have tracked at Amazon to date — ties its fall Prime Day low.' },
+  { key: 'ring-indoor-cam-2k', name: 'Ring Indoor Cam 2K', store: 'Amazon', cat: 'Smart Home', sale: 24.99, usual: 59.99, verdict: 'NEW LOW', src: 'PopSci', ev: 'Tying its 2026 low — lowest Amazon price ever (Keepa).' },
+  /* Fashion (4) */
+  { key: 'new-balance-574', name: "New Balance Men's 574 Core Sneakers", store: 'Amazon', cat: 'Fashion', sale: 74.95, usual: 99.99, verdict: 'ROUTINE SALE', src: 'CNN Underscored', ev: '25% off — $74.95 at Amazon.' },
+  { key: 'nike-vomero-5', name: "Nike Zoom Vomero 5 (women's, Pink Glow)", store: 'Nike', cat: 'Fashion', sale: 106.97, usual: 170.00, verdict: 'STRONG DEAL', src: 'stupiddope.com', ev: 'Pink Glow $106.97 vs $170 — Nike listing, 23 Nov.', note: 'Extra 25% off with code BFRIDAY at checkout (about $80.23) — the code is not the sale price.' },
+  { key: 'nike-air-max-sc', name: "Nike Men's Air Max SC", store: 'Amazon', cat: 'Fashion', sale: 50.13, usual: 90.00, verdict: 'STRONG DEAL', src: 'koupon.ai', ev: '$50.13 (was $90.00) — 44% off, no code needed.', note: 'Summit White/Stadium Green, size 9 — price varies by size and color.' },
+  { key: 'nike-dunk-low-womens', name: "Nike Women's Dunk Low Sneakers", store: 'Amazon', cat: 'Fashion', sale: 91.07, usual: 163.75, verdict: 'STRONG DEAL', src: 'koupon.ai', ev: 'Size 10, $91.07 — 44% off its $163.75 list price (live price feed, 28 Nov).', note: 'Shimmer/Burnt Sunrise, women\'s size 10.' },
+  /* Beauty (3) */
+  { key: 'truskin-vitamin-c', name: 'TruSkin Vitamin C Facial Serum, 2 oz', store: 'Amazon', cat: 'Beauty', sale: 19.31, usual: 38.99, verdict: 'NEW LOW', src: 'BuzzFeed', ev: 'Matching its fall Prime Day best-ever price — lowest price ever, ties the record.', note: 'Prime-exclusive price — non-Prime pays $34.99.' },
+  { key: 'dyson-airwrap', name: 'Dyson Airwrap Multistyler', store: 'Dyson', cat: 'Beauty', sale: 500.00, usual: 649.99, verdict: 'STRONG DEAL', src: 'CNN Underscored', ev: '$150 off right now — lowest price of the year.' },
+  { key: 'waterpik-aquarius', name: 'Waterpik Aquarius Water Flosser', store: 'Amazon', cat: 'Beauty', sale: 49.99, usual: 99.99, verdict: 'STRONG DEAL', src: 'Product Bible', ev: 'Half price.' }
+];
 
-  window.DEALHAWK = { checkedAt: CHECKED_AT, deals: DEALS, compare: COMPARE };
-})();
+/* Compare-only prices (not deal rows): the same hero product at another
+   store, verified live 28 Nov 2026. Shown in the detail compare table. */
+var COMPARE = {
+  'beats-studio-pro': [
+    { store: 'Amazon', sale: 139.95, usual: 299.99 },
+    { store: 'Target', sale: 149.99, usual: 349.99 }
+  ],
+  'dualsense': [
+    { store: 'Best Buy', sale: 54.99, usual: 74.99 },
+    { store: 'Target', sale: 54.99, usual: 74.99 }
+  ]
+};

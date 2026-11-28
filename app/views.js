@@ -1,94 +1,100 @@
-/* DealHawk detail view: full deal page + same-product price comparison
-   across stores for the six hero products. Rendered from data.js only. */
-(function () {
-  var F = window.DealHawkFilters;
+/* DealHawk views — grid cards and the per-deal detail page. */
 
-  var ICONS = {
-    "Tech": "M4 5h16v11H4z M8 19h8 M12 16v3",
-    "TV & Audio": "M3 6h18v10H3z M9 20h6",
-    "Gaming": "M7 8h10a4 4 0 0 1 4 4v2a3 3 0 0 1-5 2l-1-1H9l-1 1a3 3 0 0 1-5-2v-2a4 4 0 0 1 4-4z",
-    "Home & Kitchen": "M4 11h16v9H4z M5 11l7-6 7 6 M10 20v-5h4v5",
-    "Toys": "M9 3h6v4H9z M12 7v13 M7 20h10 M8 12h8",
-    "Smart Home": "M12 3l8 7v9h-5v-5h-6v5H4v-9z",
-    "Fashion": "M8 4l4 3 4-3 3 4-7 12-7-12z",
-    "Beauty": "M9 3h6v3H9z M10 6h4l1 13a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"
-  };
+/* Category tile: inline SVG, no product photos, no external images. */
+var ICONS = {
+  'Tech': '<svg class="ico" viewBox="0 0 16 16" fill="none" stroke="#ffc93c" stroke-width="1.5"><rect x="2" y="3" width="12" height="9" rx="1"/><path d="M5 14h6"/></svg>',
+  'TV & Audio': '<svg class="ico" viewBox="0 0 16 16" fill="none" stroke="#ffc93c" stroke-width="1.5"><rect x="1" y="3" width="14" height="9" rx="1"/><path d="M6 14h4"/></svg>',
+  'Gaming': '<svg class="ico" viewBox="0 0 16 16" fill="none" stroke="#ffc93c" stroke-width="1.5"><path d="M4 5h8a3 3 0 0 1 0 6h-2l-1-2H7l-1 2H4a3 3 0 0 1 0-6z"/></svg>',
+  'Home & Kitchen': '<svg class="ico" viewBox="0 0 16 16" fill="none" stroke="#ffc93c" stroke-width="1.5"><path d="M2 8l6-5 6 5v5H2z"/></svg>',
+  'Toys': '<svg class="ico" viewBox="0 0 16 16" fill="none" stroke="#ffc93c" stroke-width="1.5"><rect x="3" y="3" width="10" height="10" rx="1"/><path d="M8 3v10M3 8h10"/></svg>',
+  'Smart Home': '<svg class="ico" viewBox="0 0 16 16" fill="none" stroke="#ffc93c" stroke-width="1.5"><circle cx="8" cy="8" r="2"/><path d="M4 4l2 2M12 4l-2 2M4 12l2-2M12 12l-2-2"/></svg>',
+  'Fashion': '<svg class="ico" viewBox="0 0 16 16" fill="none" stroke="#ffc93c" stroke-width="1.5"><path d="M3 4l3-2 2 3 2-3 3 2-1 9H4z"/></svg>',
+  'Beauty': '<svg class="ico" viewBox="0 0 16 16" fill="none" stroke="#ffc93c" stroke-width="1.5"><circle cx="8" cy="6" r="3"/><path d="M5 12h6l1 2H4z"/></svg>'
+};
 
-  function icon(category) {
-    var d = ICONS[category] || ICONS["Tech"];
-    return '<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="' + d + '"/></svg>';
+function iconFor(cat) {
+  return ICONS[cat] || ICONS['Tech'];
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function cardHtml(p, multiStoreKeys) {
+  const d = p.best;
+  const multi = multiStoreKeys.has(p.key);
+  const slug = slugOf(d, multi);
+  const also = p.others.length
+    ? '<div class="also">Also at ' + p.others.map((o) => '<b>' + esc(o.store) + ' ' + money(o.sale) + '</b>').join(' &middot; ') + '</div>'
+    : '';
+  return '<a class="card" href="#/deal/' + slug + '">' +
+    '<div class="row1">' + iconFor(d.cat) + '<span class="store">' + esc(d.store) + '</span>' +
+    '<span class="cat">' + esc(d.cat) + '</span></div>' +
+    '<h3>' + esc(d.name) + '</h3>' +
+    '<div class="prices"><span class="sale">' + money(d.sale) + '</span>' +
+    '<span class="usual">' + money(d.usual) + '</span>' +
+    '<span class="off">&minus;' + discountOf(d) + '%</span></div>' +
+    '<div class="meta"><i class="chip ' + verdictClass(d.verdict) + '">' + d.verdict + '</i>' +
+    '<span class="save">Save ' + money(saveOf(d)) + '</span>' +
+    '<span class="score">Score ' + scoreOf(d) + '/100</span></div>' +
+    also +
+    '<div class="src">Checked ' + esc(CHECKED) + ' &middot; ' + esc(d.src) + '</div>' +
+    '</a>';
+}
+
+function gridHtml(products, totalDeals, totalProducts, sortLabel) {
+  if (!products.length) return '<div class="empty">No deals match those filters. Clear the search or lower the discount.</div>';
+  const label = '<p class="grid-label">Showing ' + products.length + ' of ' + totalProducts + ' products &middot; ' +
+    totalDeals + ' deals &middot; ' + (sortLabel || 'sorted by best deal score') + '</p>';
+  return label + '<div class="grid">' + products.map((p) => cardHtml(p, MULTI_STORE_KEYS)).join('') + '</div>';
+}
+
+/* Detail page: full deal info + the same product at other stores, best marked. */
+function detailHtml(slug) {
+  const d = DEAL_BY_SLUG[slug];
+  if (!d) return '<div class="empty">Deal not found. <a href="#/">Back to all deals</a></div>';
+  const p = PRODUCT_BY_KEY[d.key];
+  const rows = compareRows(d.key);
+  const rowsHtml = rows.map((r) => {
+    const best = r.best ? ' class="best"' : '';
+    const tag = r.best ? ' <span class="best-tag">BEST PRICE</span>' : '';
+    return '<tr' + best + '><td>' + esc(r.store) + '</td><td>' + money(r.sale) + '</td>' +
+      '<td>' + money(r.usual) + '</td><td>&minus;' + r.disc + '%</td><td>Save ' + money(r.save) + tag + '</td></tr>';
+  }).join('');
+  const note = d.note ? '<div class="note">' + esc(d.note) + '</div>' : '';
+  return '<article class="detail">' +
+    '<a class="back" href="#/">&larr; All deals</a>' +
+    '<h1>' + esc(d.name) + '</h1>' +
+    '<div class="dsub">' + esc(d.store) + ' &middot; ' + esc(d.cat) + '</div>' +
+    '<div class="dprices"><span class="sale">' + money(d.sale) + '</span>' +
+    '<span class="usual">' + money(d.usual) + '</span>' +
+    '<span class="off">&minus;' + discountOf(d) + '%</span></div>' +
+    '<div class="dmeta"><i class="chip ' + verdictClass(d.verdict) + '">' + d.verdict + '</i>' +
+    '<span class="save">You save ' + money(saveOf(d)) + '</span>' +
+    '<span class="score">Score ' + scoreOf(d) + '/100</span></div>' +
+    '<div class="evidence"><b>Why this verdict:</b> ' + esc(d.ev) + '</div>' +
+    note +
+    '<a class="visit" href="' + storeSearchUrl(d.store, d.name) + '" target="_blank" rel="noopener">View at ' + esc(d.store) + ' &rarr;</a>' +
+    '<h2>Same product, other stores</h2>' +
+    '<table class="compare"><thead><tr><th>Store</th><th>Sale</th><th>Usual</th><th>Off</th><th>You save</th></tr></thead>' +
+    '<tbody>' + rowsHtml + '</tbody></table>' +
+    '<p class="checked-line">Checked ' + esc(CHECKED) + ' &middot; Source: ' + esc(d.src) +
+    '. Store links go to the store&rsquo;s own search for this product.</p>' +
+    '</article>';
+}
+
+/* Compare rows: every variant of this product in DEALS, plus compare-only
+   prices from COMPARE (verified in R1, re-checked 28 Nov), best marked. */
+function compareRows(key) {
+  const p = PRODUCT_BY_KEY[key];
+  const rows = p.variants.map((d) => ({ store: d.store, sale: d.sale, usual: d.usual, disc: discountOf(d), save: saveOf(d) }));
+  const extra = (typeof COMPARE !== 'undefined' && COMPARE[key]) || [];
+  for (const e of extra) {
+    if (rows.some((r) => r.store === e.store)) continue;
+    const usual = e.usual || p.best.usual;
+    rows.push({ store: e.store, sale: e.sale, usual, disc: Math.round((usual - e.sale) / usual * 100), save: Math.round((usual - e.sale) * 100) / 100 });
   }
-
-  function verdictClass(v) {
-    return v === "NEW LOW" ? "v-new" : v === "STRONG DEAL" ? "v-strong" : "v-routine";
-  }
-
-  function cardHTML(d) {
-    var pct = F.discountPct(d);
-    var save = F.money(d.usual - d.sale);
-    return '<article class="card">'
-      + '<a class="card-link" href="#/deal/' + d.slug + '">'
-      + '<span class="card-icon">' + icon(d.category) + '</span>'
-      + '<span class="card-verdict ' + verdictClass(d.verdict) + '">' + d.verdict + '</span>'
-      + '<span class="card-name">' + d.name + '</span>'
-      + '<span class="card-meta">' + d.store + ' &middot; ' + d.category + '</span>'
-      + '<span class="card-prices"><span class="sale">' + F.money(d.sale) + '</span>'
-      + '<span class="usual"><s>' + F.money(d.usual) + '</s></span>'
-      + '<span class="pct">-' + pct + '%</span></span>'
-      + '<span class="card-save">You save ' + save + ' &middot; Checked ' + window.DEALHAWK.checkedAt + '</span>'
-      + '</a>'
-      + '<a class="card-shop" href="' + F.storeUrl(d.store, d.name) + '" target="_blank" rel="noopener">Shop at ' + d.store + ' &nearr;</a>'
-      + '</article>';
-  }
-
-  function detailHTML(d) {
-    var pct = F.discountPct(d);
-    var save = F.money(d.usual - d.sale);
-    var factsHTML = '<dl class="detail-facts">'
-      + '<dt>Price checked</dt><dd>' + window.DEALHAWK.checkedAt + '</dd>'
-      + '<dt>Where the price was read</dt><dd>' + d.source + '</dd>'
-      + '<dt>Evidence</dt><dd>' + d.evidence + '</dd>'
-      + '<dt>Verdict</dt><dd>' + d.verdict + ' — '
-      + (d.verdict === "NEW LOW"
-        ? "the source calls this an all-time low / best price to date."
-        : d.verdict === "STRONG DEAL"
-        ? "a big cut (40%+), or the source calls it the lowest price it has tracked."
-        : "a real cut, but the price has been seen lower before, or the cut is small.")
-      + '</dd></dl>';
-    /* Same-product comparison, built first so it renders right under the
-       shop button — the most useful thing on the page. */
-    var rows = d.group ? window.DEALHAWK.compare[d.group] : null;
-    var compareHTML = "";
-    if (rows && rows.length > 1) {
-      var best = Math.min.apply(null, rows.map(function (r) { return r.sale; }));
-      compareHTML = '<h3>Same product, other stores</h3>'
-        + '<p class="compare-note">Verified prices for the same product, checked ' + window.DEALHAWK.checkedAt + '. The cheapest store is marked.</p>'
-        + '<table class="compare"><thead><tr><th>Store</th><th>Sale price</th><th>Usual</th><th>Off</th><th></th></tr></thead><tbody>';
-      rows.forEach(function (r) {
-        var p = Math.round((r.usual - r.sale) / r.usual * 100);
-        compareHTML += '<tr' + (r.sale === best ? ' class="best-row"' : '') + '>'
-          + '<td>' + r.store + '</td><td><strong>' + F.money(r.sale) + '</strong></td>'
-          + '<td><s>' + F.money(r.usual) + '</s></td><td>-' + p + '%</td>'
-          + '<td>' + (r.sale === best ? '<span class="best-tag">BEST PRICE</span>' : '') + '</td></tr>';
-      });
-      compareHTML += '</tbody></table>';
-    }
-    var html = '<div class="detail">'
-      + '<p class="crumbs"><a href="#/">&larr; All deals</a> &middot; ' + d.category + ' &middot; ' + d.store + '</p>'
-      + '<div class="detail-head"><span class="card-icon big">' + icon(d.category) + '</span>'
-      + '<div><h2>' + d.name + '</h2>'
-      + '<p class="detail-store">Sold at <strong>' + d.store + '</strong></p></div></div>'
-      + '<p><span class="card-verdict ' + verdictClass(d.verdict) + '">' + d.verdict + '</span></p>'
-      + '<p class="detail-prices"><span class="sale big">' + F.money(d.sale) + '</span>'
-      + '<span class="usual big"><s>' + F.money(d.usual) + '</s></span>'
-      + '<span class="pct big">-' + pct + '%</span></p>'
-      + '<p class="detail-save">You save <strong>' + save + '</strong> off the usual price of ' + F.money(d.usual) + '.</p>'
-      + '<p><a class="btn-shop" href="' + F.storeUrl(d.store, d.name) + '" target="_blank" rel="noopener">Shop this deal at ' + d.store + ' &nearr;</a></p>'
-      + compareHTML
-      + factsHTML;
-    html += '</div>';
-    return html;
-  }
-
-  window.DealHawkViews = { cardHTML: cardHTML, detailHTML: detailHTML, icon: icon };
-})();
+  rows.sort((a, b) => a.sale - b.sale);
+  rows.forEach((r, i) => { r.best = i === 0; });
+  return rows;
+}
